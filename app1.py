@@ -5,9 +5,9 @@ import openai
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 import streamlit as st
 
-# read the OpenAI API key
-#openai.api_key = open("OpenAI_API_Key.txt", "r").read().strip()
-#os.environ['OPENAI_API_KEY'] = openai.api_key
+    # read the OpenAI API key
+    #openai.api_key = open("OpenAI_API_Key.txt", "r").read().strip()
+    #os.environ['OPENAI_API_KEY'] = openai.api_key
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -458,26 +458,20 @@ def lower_the_better_rule(series, user_value):
 
     return series_
 
-df = pd.DataFrame(df["Description"], columns=["Description"])
-df.head()
 
-df["dict_"] = df["Description"].apply(product_map_layer)
-df = pd.concat([df, df["dict_"].apply(pd.Series)], axis=1)
-if "dict_" in df.columns:
-    df = df.drop(columns=['dict_'])
-df.head()
+#################
+@st.cache_data
+def build_laptop_catalogue():
+    catalogue = pd.DataFrame(df["Description"], columns=["Description"])
+    catalogue["dict_"] = catalogue["Description"].apply(product_map_layer)
+    catalogue = pd.concat([catalogue, catalogue["dict_"].apply(pd.Series)], axis=1)
+    catalogue = catalogue.drop(columns=["dict_"])
+    catalogue["Budget"] = pd.to_numeric(catalogue["Budget"], errors="coerce")
+    return catalogue
 
-df_after_budget_filter = filter_data_by_budget(sample_user_query["Budget"])
+df = build_laptop_catalogue()
+#########################
 
-df_after_budget_filter["CPU"] = higher_the_better_rule(df_after_budget_filter["CPU"], sample_user_query["CPU"])
-df_after_budget_filter["GPU"] = higher_the_better_rule(df_after_budget_filter["GPU"], sample_user_query["GPU"])
-df_after_budget_filter["Display Quality"] = higher_the_better_rule(df_after_budget_filter["Display Quality"], sample_user_query["Display Quality"])
-df_after_budget_filter["Portability"] = lower_the_better_rule(df_after_budget_filter["Portability"], sample_user_query["Portability"])
-df_after_budget_filter["Multitasking"] = higher_the_better_rule(df_after_budget_filter["Multitasking"], sample_user_query["Multitasking"])
-df_after_budget_filter["Score"] = df_after_budget_filter["CPU"] + df_after_budget_filter["GPU"] + df_after_budget_filter["Display Quality"] + df_after_budget_filter["Portability"] + df_after_budget_filter["Multitasking"]
-
-df_after_budget_filter = df_after_budget_filter.sort_values(by=["Score", "Budget"], ascending=[False, True], ignore_index=True)
-df_after_budget_filter.head(3)
 
 
 def initialize_conv_reco(products):
@@ -509,7 +503,7 @@ def dialogue_mgmt_system():
         user_input = input("")
 
         moderation = moderation_check(user_input)
-        if moderation == 'Flagged':
+        if moderation:
             display("Sorry, this message has been flagged. Please restart your conversation.")
             break
 
@@ -517,7 +511,7 @@ def dialogue_mgmt_system():
             conversation.append({"role": "user", "content": user_input})
             response_assistant = get_chat_completions(conversation)
             moderation = moderation_check(response_assistant)
-            if moderation == 'Flagged':
+            if moderation:
                 display("Sorry, this message has been flagged. Please restart your conversation.")
                 break
 
@@ -597,7 +591,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     moderation = moderation_check(user_input)
-    if moderation == 'Flagged':
+    if moderation:
         msg = "Sorry, this message has been flagged. Please restart the conversation."
         with st.chat_message("assistant"):
             st.markdown(msg)
@@ -632,14 +626,39 @@ if user_input:
 
             with st.spinner("Thank you for providing all the information. Fetching the best laptops for you..."):
                 response = dictionary_present(response_assistant)
-                top_3_laptops = compare_laptops_with_user(response)
-                validated_reco = recommendation_validation(top_3_laptops)
-                conversation_reco = initialize_conv_reco(validated_reco)
+                budget_value = int(str(response["Budget"]).replace(",", ""))
+
+                df_after_budget_filter = filter_data_by_budget(budget_value)
+
+                if df_after_budget_filter is False:
+                    no_match_msg = "Sorry, I couldn't find any laptops within that budget. Could you share a higher budget?"
+                    with st.chat_message("assistant"):
+                        st.markdown(no_match_msg)
+                    st.session_state.messages.append({"role": "assistant", "content": no_match_msg})
+                    st.stop()
+
+                df_after_budget_filter["CPU"] = higher_the_better_rule(df_after_budget_filter["CPU"], response["CPU"])
+                df_after_budget_filter["GPU"] = higher_the_better_rule(df_after_budget_filter["GPU"], response["GPU"])
+                df_after_budget_filter["Display Quality"] = higher_the_better_rule(df_after_budget_filter["Display Quality"], response["Display Quality"])
+                df_after_budget_filter["Portability"] = lower_the_better_rule(df_after_budget_filter["Portability"], response["Portability"])
+                df_after_budget_filter["Multitasking"] = higher_the_better_rule(df_after_budget_filter["Multitasking"], response["Multitasking"])
+                df_after_budget_filter["Score"] = (
+                    df_after_budget_filter["CPU"] + df_after_budget_filter["GPU"]
+                    + df_after_budget_filter["Display Quality"] + df_after_budget_filter["Portability"]
+                    + df_after_budget_filter["Multitasking"]
+                )
+                df_after_budget_filter = df_after_budget_filter.sort_values(
+                    by=["Score", "Budget"], ascending=[False, True], ignore_index=True
+                )
+                top_3_laptops = df_after_budget_filter.head(3)
+
+                conversation_reco = initialize_conv_reco(list(top_3_laptops["Description"].values))
                 conversation_reco.append({"role": "user", "content": "This is my user profile" + str(response)})
                 recommendation = get_chat_completions(conversation_reco)
+                
 
             moderation = moderation_check(recommendation)
-            if moderation == 'Flagged':
+            if moderation:
                 msg = "Sorry, this message has been flagged. Please restart the conversation."
                 with st.chat_message("assistant"):
                     st.markdown(msg)
@@ -661,7 +680,7 @@ if user_input:
         response_asst_reco = get_chat_completions(st.session_state.conversation_reco)
 
         moderation = moderation_check(response_asst_reco)
-        if moderation == 'Flagged':
+        if moderation:
             msg = "Sorry, this message has been flagged. Please restart the conversation."
             with st.chat_message("assistant"):
                 st.markdown(msg)
