@@ -560,11 +560,34 @@ def dialogue_mgmt_system():
             conversation.append({"role": "assistant", "content": response_asst_reco})
 
 
-            ###########################################################################
+##############################################################################
+############### Deployement ############
 
-
-
-st.title("🛍️ Shop Assist AI — 💻 Laptop Recommendation Chatbot")
+st.markdown("""
+<style>
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #0e1117;
+    z-index: 999;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #333;
+}
+.fixed-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+.block-container {
+    padding-top: 4rem !important;
+}
+</style>
+<div class="fixed-header">
+    <h3>🛍️ Shop Assist AI — 💻 Laptop Recommendation Chatbot</h3>
+</div>
+""", unsafe_allow_html=True)
 
 # ---- Initialize session state (runs once per browser session) ----
 if "conversation" not in st.session_state:
