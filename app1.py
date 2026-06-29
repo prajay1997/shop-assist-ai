@@ -575,7 +575,7 @@ st.markdown("""
     left: 0;
     right: 0;
     background-color: #ffffff;
-    z-index: 999998;
+    z-index: 1;
     padding: 0.5rem 1rem;
     border-bottom: 1px solid #333;
     text-align: center;
@@ -587,6 +587,12 @@ st.markdown("""
 }
 .block-container {
     padding-top: 3.5rem !important;
+}
+.main .block-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 85vh;
 }
 </style>
 <div class="fixed-header">
