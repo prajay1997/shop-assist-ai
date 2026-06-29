@@ -563,7 +563,6 @@ def dialogue_mgmt_system():
 ##############################################################################
 ############### Deployement ############
 
-
 st.markdown("""
 <style>
 [data-testid="stHeader"] {
@@ -578,14 +577,15 @@ st.markdown("""
     z-index: 999999;
     padding: 0.5rem 1rem;
     border-bottom: 1px solid #333;
+    text-align: center;
 }
 .fixed-header h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.4rem;
     color: white;
 }
 .block-container {
-    padding-top: 3.2rem !important;
+    padding-top: 3.5rem !important;
 }
 </style>
 <div class="fixed-header">
