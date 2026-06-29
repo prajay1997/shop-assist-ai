@@ -583,7 +583,7 @@ st.markdown("""
 .fixed-header h3 {
     margin: 0;
     font-size: 1.4rem;
-    color: white;
+    color: #000000;
 }
 .block-container {
     padding-top: 3.5rem !important;
