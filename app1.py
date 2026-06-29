@@ -563,25 +563,30 @@ def dialogue_mgmt_system():
 ##############################################################################
 ############### Deployement ############
 
+st.markdown("<h1 style='color:red;'>TEST MARKER 12345</h1>", unsafe_allow_html=True)
+
 st.markdown("""
 <style>
+[data-testid="stHeader"] {
+    display: none;
+}
 .fixed-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background-color: #0e1117;
-    z-index: 999;
-    padding: 0.6rem 1rem;
+    z-index: 999999;
+    padding: 0.5rem 1rem;
     border-bottom: 1px solid #333;
 }
 .fixed-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: white;
 }
 .block-container {
-    padding-top: 4rem !important;
+    padding-top: 3.2rem !important;
 }
 </style>
 <div class="fixed-header">
