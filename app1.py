@@ -566,15 +566,16 @@ def dialogue_mgmt_system():
 st.markdown("""
 <style>
 [data-testid="stHeader"] {
-    display: none;
+    background: transparent;
+    height: 2.5rem;
 }
 .fixed-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    background-color: #0e1117;
-    z-index: 999999;
+    background-color: #ffffff;
+    z-index: 999998;
     padding: 0.5rem 1rem;
     border-bottom: 1px solid #333;
     text-align: center;
