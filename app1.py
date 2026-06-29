@@ -563,7 +563,6 @@ def dialogue_mgmt_system():
 ##############################################################################
 ############### Deployement ############
 
-st.markdown("<h1 style='color:red;'>TEST MARKER 12345</h1>", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
