@@ -564,7 +564,7 @@ def dialogue_mgmt_system():
 
 
 
-st.title("🛍️ Shop Assist AI — Laptop Recommendation Chatbot")
+st.title("🛍️ Shop Assist AI — 💻 Laptop Recommendation Chatbot")
 
 # ---- Initialize session state (runs once per browser session) ----
 if "conversation" not in st.session_state:
