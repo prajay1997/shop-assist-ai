@@ -596,7 +596,7 @@ st.markdown("""
 }
 </style>
 <div class="fixed-header">
-    <h3>🛍️ Shop Assist AI — 💻 Laptop Recommendation Chatbot</h3>
+    <h3>🛍️ Shop Assist AI : 💻 Laptop Recommendation Chatbot</h3>
 </div>
 """, unsafe_allow_html=True)
 
